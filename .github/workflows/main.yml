@@ -1,22 +1,27 @@
-name: workflow to execute the JAVA application
-on: # Events to trigger the multiple jobs
+name: workflow to execute the JAVA appliction and to download the artificat
+on:
  workflow_dispatch:
  push:
    branches:
         - master
  pull_request:
-   branches:
-        - master
+    branches:
+        - master   
 jobs:
-  job1:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone the repo
-        uses: actions/checkout@v6
-      - name: Install the JAVA version
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin' 
-          java-version: '25'  
-      - name: Build the code
-        run : mvn clean package
+ job1:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Clone the repo
+      uses: actions/checkout@v6
+    - name: Insatll the JAVA application
+      uses:  actions/setup-java@v5
+      with:
+       distribution: 'temurin' 
+       java-version: '25'
+    - name: build the java code
+      run: mvn clean package
+    - name: upload the artifact from runner to github repo
+      uses: actions/upload-artifact@v4
+      with:
+        name: wicket-pwnedpasswords-validator-2.0.1-SNAPSHOT.jar  
+        path: /home/runner/work/SonarQubeCoverageJava/SonarQubeCoverageJava/target/wicket-pwnedpasswords-validator-2.0.1-SNAPSHOT.jar 
