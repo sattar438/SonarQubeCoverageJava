@@ -19,4 +19,4 @@ jobs:
           distribution: 'temurin' 
           java-version: '25'  
       - name: Build the code
-        uses: mvn package
+        run : mvn clean package
