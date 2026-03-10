@@ -1,0 +1,47 @@
+name: build JAVA application
+on: # multiple triggers when this workflow can run
+ workflow_dispatch: # also select which job to run
+   inputs:  # user to select the jobname
+     job_name:  # can be any name like a variable name
+       description: "Select the Job to run" # desciption visible to user
+       required: true  # user should mandatory select one job for the workflow to start
+       type: choice # job_name stores multiple values for user to select
+       options:  # give correct job names
+         - job1_build
+         - job2_codeCoverage
+jobs:
+  job1_build:
+    if: ${{ github.event.inputs.job_name == 'job1_build' }}
+    # run above job when input selected is job1_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the repo
+        uses: actions/checkout@v6
+      - name: Install java on runner
+        uses: actions/setup-java@v5
+        with:
+        distribution: 'temurin'
+        java-version: '17'
+      - name: build java code
+        run: mvn clean package
+  job2_codeCoverage:
+    if: ${{ github.event.inputs.job_name == 'job2_codeCoverage' }}
+    #needs: job1_build # creating dependency between 2 jobs.
+    # first build job will be completed and then code coverage will start
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone the repo
+      uses: actions/checkout@v6
+    - name: Install java on runner
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: build java code
+      run: mvn clean package
+    - name: Code Coverage using sonarcloud
+      run: mvn -B verify sonar:sonar -Dsonar.projectKey=sonar-org-jan-2026_sonar-org-jan-2026-project -Dsonar.organization=sonar-org-jan-2026 -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN
+      env:
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       # GITHUB_TOKEN: Automatically generated token for GitHub API authentication (with limited scope).
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
